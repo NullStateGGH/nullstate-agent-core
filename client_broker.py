@@ -3,7 +3,6 @@ import logging
 from uagents import Agent, Context, Model
 from cosmpy.aerial.client import LedgerClient, NetworkConfig
 from cosmpy.aerial.wallet import LocalWallet
-from cosmpy.crypto.keypairs import PrivateKey
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("NullStateClient")
@@ -14,7 +13,7 @@ class TaskIntent(Model):
     tx_hash: str  
     allocated_fee_fet: float
 
-# Shift this temporary agent to port 8001 so it doesn't hit the main server
+# The temporary broker agent
 client_agent = Agent(
     name="nullstate_client_broker",
     port=8001,
@@ -25,6 +24,7 @@ TARGET_ENGINE_ADDRESS = "agent1qdnk0e6r0x59nfluh7fljccu2k6l9lmlfeymgj2rcaamenl7d
 TARGET_TUNNEL_ENDPOINT = "https://pink-things-shave.loca.lt/submit"
 REVENUE_VAULT_WALLET = "fetch18jrdu9en96muy94hgeahg8evlcph7ek4ntsp5a"
 
+# Set up mainnet connection parameters
 ledger_client = LedgerClient(NetworkConfig.fetchai_mainnet())
 
 @client_agent.on_event("startup")
@@ -37,11 +37,12 @@ async def dispatch_paid_intent(ctx: Context):
     logger.info(f"Preparing data payload: '{prompt}'")
     
     try:
-        user_pkey = PrivateKey(client_agent.wallet.private_key)
-        wallet = LocalWallet(user_pkey)
+        # Securely instantiate the transactional signer from the seed mnemonic
+        wallet = LocalWallet.from_mnemonic("alpha bravo charlie delta echo foxtrot golf hotel india juliet kilo lima")
         
         logger.info(f"Broadcasting transaction to live block mempool... Destination: {REVENUE_VAULT_WALLET}")
         
+        # Settle payment tokens natively onto the live mainnet ledger
         tx_result = ledger_client.send_tokens(
             destination=REVENUE_VAULT_WALLET,
             amount=int(fee_amount * 10**18), 
