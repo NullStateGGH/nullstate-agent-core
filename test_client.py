@@ -2,29 +2,32 @@ import asyncio
 from uagents import Model
 from uagents.query import send_sync_message
 
+# Match the worker node schema parameters
 class TaskIntent(Model):
     task_id: str
     intent_data: str
-    max_fee_usdc: float
+    tx_hash: str  
+    allocated_fee_fet: float
 
 TARGET_WORKER_ADDRESS = "agent1q0pzh3etywtylwygyfytuae2gtsrymkk4gugsnvvj788hp4g5jgt77m805q"
 
 async def send_paid_intent():
     test_payload = TaskIntent(
-        task_id="TX_INTENT_9982",
-        intent_data="Analyze this short sentiment: 'DeFi volumes on Base L2 are exploding due to gasless agent transactions.'",
-        max_fee_usdc=0.05
+        task_id="TX_MAINNET_8831",
+        intent_data="Compile a 3-step execution plan for an AI agent to arbitrage liquidity between pool X and pool Y on a DEX.",
+        tx_hash="mock_fai_tx_hash_verification_pass_2026",
+        allocated_fee_fet=0.1
     )
     
-    print(f"Sending Task Intent directly to secure address: {TARGET_WORKER_ADDRESS}...")
+    print(f"Transmitting intent payload directly to target worker: {TARGET_WORKER_ADDRESS}")
     
-    # Modern, non-deprecated unified messaging protocol mapping
-    response = send_sync_message(
-        destination=TARGET_WORKER_ADDRESS, 
-        message=test_payload, 
-        endpoint="http://127.0.0.1:8000/submit"
+    # Unified Async-Await Protocol Adjustment
+    response = await send_sync_message(
+        TARGET_WORKER_ADDRESS,
+        test_payload,
+        "http://127.0.0.1:8000/submit"
     )
-    print("Payload transmitted successfully and logged clean.")
+    print("Task request packet successfully routed and connection closed cleanly.")
 
 if __name__ == "__main__":
     asyncio.run(send_paid_intent())
