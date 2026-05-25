@@ -23,7 +23,6 @@ TARGET_ENGINE_ADDRESS = "agent1qdnk0e6r0x59nfluh7fljccu2k6l9lmlfeymgj2rcaamenl7d
 TARGET_TUNNEL_ENDPOINT = "https://pink-things-shave.loca.lt/submit"
 REVENUE_VAULT_WALLET = "fetch18jrdu9en96muy94hgeahg8evlcph7ek4ntsp5a"
 
-# Point to the official production mainnet config
 ledger_client = LedgerClient(NetworkConfig.fetchai_mainnet())
 
 @client_agent.on_event("startup")
@@ -31,25 +30,22 @@ async def dispatch_paid_intent(ctx: Context):
     logger.info("=== INITIALIZING CLIENT BROKER TRANSMISSION ===")
     
     prompt = "Analyze the recent 2026 mainnet trends for ASI multi-agent scalability and provide a 3-sentence summary."
-    
-    # Send a tiny fraction of a FET token for verification (100,000 atto-FET)
     fee_amount = 0.0000000000001 
     
     logger.info(f"Preparing data payload: '{prompt}'")
     
     try:
-        # Utilize your active, funded mainnet mnemonic phrase to sign the transaction
         production_seed = "into rent follow client club shoulder fan symbol deputy tide blossom guard"
         wallet = LocalWallet.from_mnemonic(production_seed)
         
         logger.info(f"Broadcasting transaction to live block mempool... Destination: {REVENUE_VAULT_WALLET}")
         
-        # Settle payment tokens natively onto the live mainnet ledger
+        # Settle payment tokens natively using the updated sender argument syntax
         tx_result = ledger_client.send_tokens(
             destination=REVENUE_VAULT_WALLET,
             amount=int(fee_amount * 10**18), 
-            denom="afet", # Enforce correct native mainnet denomination string
-            wallet=wallet
+            denom="afet", 
+            sender=wallet
         )
         
         logger.info(f"Transaction successfully mined! Block Hash: {tx_result.tx_hash}")
